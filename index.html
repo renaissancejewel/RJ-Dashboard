@@ -274,6 +274,7 @@ th.hl{
   <div class="card">
     <h2 id="lbt"></h2>
     <div id="lb"></div>
+    <p class="note" id="incentive-disclaimer" hidden>Incentive amounts shown are estimates and are subject to review and final approval.</p>
   </div>
 
   <div class="card">
@@ -555,6 +556,7 @@ function render(){
 
 
   document.getElementById("lb").innerHTML = h;
+  document.getElementById("incentive-disclaimer").hidden = met !== 0;
 
 
   /* =======================================================
@@ -713,3 +715,4 @@ setInterval(loadData,60000);
 </script>
 </body>
 </html>
+
