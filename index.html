@@ -298,6 +298,9 @@ const API_URL =
 "https://script.google.com/macros/s/AKfycbw4oxTn6UTxjiWa3pkob3jJMCPm2weD7Y4GHBMRNdujwLwZWXeYKOttg6pIkOOUNGRM/exec";
 
 let DATA = [];
+let OVERTIME = [];
+let TODAY = "";
+let overtimeAvailable = false;
 
 
 /* =========================================================
@@ -305,19 +308,21 @@ let DATA = [];
    ========================================================= */
 
 var M = [
-  "Total Sales",
+  "Total Incentives",
   "Saved Cancellation",
   "General Queries",
   "Issues Resolved",
-  "Total Interactions"
+  "Total Interactions",
+  "Overtime Hours"
 ];
 
 var S = [
-  "Sales",
+  "Incentives",
   "Saved Cancellation",
   "General Queries",
   "Issues Resolved",
-  "Total Interactions"
+  "Total Interactions",
+  "Overtime Hours"
 ];
 
 
@@ -325,15 +330,9 @@ var S = [
    PERIOD
    ========================================================= */
 
-var PER = {
-  Sep:["Sep"]
-};
-
-var PL = {
-  Sep:"September 2026"
-};
-
-var per = "Sep";
+var PER = { Sep:"2026-09", Oct:"2026-10" };
+var PL = { Sep:"September 2026", Oct:"October 2026" };
+var per = "Oct";
 var met = 0;
 
 
@@ -341,104 +340,45 @@ var met = 0;
    AGGREGATE DATA
    ========================================================= */
 
-function agg(){
-
-  var o = {};
-
-  DATA.forEach(function(row){
-
-    var d = new Date(row.date);
-
-    if(isNaN(d)) return;
-
-
-    /* Ignore future dates */
-
-    var today = new Date();
-
-    today.setHours(23,59,59,999);
-
-    if(d > today) return;
-
-
-    /* Get month */
-
-    var month = d.toLocaleString(
-      "en-US",
-      {month:"short"}
-    );
-
-    if(!PER[per].includes(month)) return;
-
-
-    /* Agent */
-
-    var a = row.agent;
-
-    if(!a) return;
-
-
-    /* Create agent */
-
-    if(!o[a]){
-
-      o[a] = {
-        v:[0,0,0,0,0]
-      };
-
-    }
-
-
-    /* Values from API */
-
-    var values = [
-
-      row.sales,
-
-      row.savedCancellation,
-
-      row.generalQueries,
-
-      row.issuesResolved,
-
-      row.totalInteractions
-
-    ];
-
-
-    /* Add values */
-
-    for(var i=0;i<5;i++){
-
-      var value = Number(values[i]);
-
-      if(!isNaN(value)){
-
-        o[a].v[i] += value;
-
-      }
-
-    }
-
-  });
-
-
-  /* Convert object to array */
-
-  return Object.keys(o).map(function(a){
-
-    return {
-
-      n:a,
-
-      v:o[a].v
-
-    };
-
-  });
-
+function nameKey(name){
+  return String(name || "").trim().replace(/\s+/g," ").toLowerCase();
 }
-
+function number(value){
+  var n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+function display(value,metric){
+  return value.toLocaleString("en-US",{maximumFractionDigits: metric===0 || metric===5 ? 2 : 0}) + (metric===5 ? " hrs" : "");
+}
+function agg(){
+  var o = Object.create(null);
+  var today = TODAY || new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
+  function agent(name){
+    var key = nameKey(name);
+    if(!key || /^(total|team|agent name|name)$/.test(key)) return null;
+    if(!o[key]) o[key] = {n:String(name).trim(),v:[0,0,0,0,0,0]};
+    return o[key];
+  }
+  DATA.forEach(function(row){
+    var date = String(row.date || "").slice(0,10);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date) || date.slice(0,7)!==PER[per] || date>today) return;
+    var a = agent(row.agent);
+    if(!a) return;
+    [row.incentives === undefined ? row.sales : row.incentives,row.savedCancellation,row.generalQueries,row.issuesResolved,row.totalInteractions].forEach(function(value,i){a.v[i]+=number(value);});
+  });
+  // Monthly overtime is added once per employee, never once per daily record.
+  OVERTIME.forEach(function(row){
+    if(row.month!==PER[per]) return;
+    var a=agent(row.agent);
+    if(a) a.v[5]+=number(row.hours);
+  });
+  return Object.keys(o).map(function(key){return o[key];});
+}
 
 /* =========================================================
    BUTTON CREATOR
@@ -467,14 +407,14 @@ function render(){
 
   var rows = agg();
 
-  var tot = [0,0,0,0,0];
+  var tot = [0,0,0,0,0,0];
 
 
   /* Calculate team totals */
 
   rows.forEach(function(r){
 
-    for(var i=0;i<5;i++){
+    for(var i=0;i<M.length;i++){
 
       tot[i] += r.v[i];
 
@@ -510,26 +450,9 @@ function render(){
 
   pe.innerHTML = "";
 
-  pe.appendChild(
-
-    btn(
-
-      "on",
-
-      "September 2026",
-
-      function(){
-
-        per = "Sep";
-
-        render();
-
-      }
-
-    )
-
-  );
-
+  Object.keys(PER).forEach(function(key){
+    pe.appendChild(btn(key===per ? "on" : "",PL[key],function(){per=key;render();}));
+  });
 
   /* =======================================================
      KPI CARDS
@@ -540,7 +463,7 @@ function render(){
   kp.innerHTML = "";
 
 
-  for(var i=0;i<5;i++)
+  for(var i=0;i<M.length;i++)
 
     (function(i){
 
@@ -552,7 +475,7 @@ function render(){
         M[i] +
         "</small>" +
         "<b>" +
-        tot[i].toLocaleString() +
+        display(tot[i],i) +
         "</b>",
 
         function(){
@@ -610,7 +533,7 @@ function render(){
         '</div>' +
 
         '<div class="nm">' +
-          r.n +
+          escapeHtml(r.n) +
         '</div>' +
 
         '<div class="trk">' +
@@ -623,7 +546,7 @@ function render(){
         '</div>' +
 
         '<div class="val">' +
-          r.v[met].toLocaleString() +
+          display(r.v[met],met) +
         '</div>' +
 
       '</div>';
@@ -641,7 +564,7 @@ function render(){
   var t = "<tr><th>Agent</th>";
 
 
-  for(var j=0;j<5;j++){
+  for(var j=0;j<M.length;j++){
 
     t +=
 
@@ -670,18 +593,18 @@ function render(){
       "<tr>" +
 
         "<td>" +
-          r.n +
+          escapeHtml(r.n) +
         "</td>";
 
 
-    for(var j=0;j<5;j++){
+    for(var j=0;j<M.length;j++){
 
       t +=
 
         '<td class="' +
         (j===met ? "hl" : "") +
         '">' +
-        r.v[j].toLocaleString() +
+        display(r.v[j],j) +
         "</td>";
 
     }
@@ -711,7 +634,7 @@ function render(){
           '">' +
 
           '<b>' +
-          x.toLocaleString() +
+          display(x,j) +
           '</b>' +
 
           '</td>'
@@ -757,74 +680,36 @@ function render(){
 
   document.getElementById("notes").textContent =
 
-    "Source: Sales/Case Resolved Tracker -Daily · " +
-    "September 2026 · " +
-    "Data refreshes automatically every 60 seconds.";
+    "Source: Sales Tracker · " +
+    PL[per] + " · " +
+    "Data refreshes automatically every 60 seconds. Overtime is monthly in decimal hours." +
+    (overtimeAvailable ? "" : " Overtime unavailable: update the Apps Script deployment.");
 
 }
 
 
-/* =========================================================
-   INITIAL API LOAD
-   ========================================================= */
-
-fetch(API_URL)
-
-  .then(function(response){
-
-    return response.json();
-
-  })
-
-  .then(function(data){
-
-    DATA = data;
-
+/* Load both daily performance and monthly overtime together. */
+async function loadData(){
+  try{
+    var response=await fetch(API_URL,{cache:"no-store"});
+    if(!response.ok) throw new Error("HTTP " + response.status);
+    var payload=await response.json();
+    if(payload.error) throw new Error(payload.error);
+    var data=Array.isArray(payload) ? payload : payload.data;
+    if(!Array.isArray(data)) throw new Error("Unexpected dashboard response");
+    if(!Array.isArray(payload) && !Array.isArray(payload.overtime)) throw new Error("Missing overtime data");
+    DATA=data;
+    OVERTIME=Array.isArray(payload.overtime) ? payload.overtime : [];
+    TODAY=payload.today || "";
+    overtimeAvailable=!Array.isArray(payload);
     render();
-
-  })
-
-  .catch(function(error){
-
-    console.error("API Error:",error);
-
-    document.getElementById("sub").textContent =
-      "Unable to load sales data.";
-
-  });
-
-
-/* =========================================================
-   AUTOMATIC REFRESH EVERY 60 SECONDS
-   ========================================================= */
-
-setInterval(function(){
-
-  fetch(API_URL)
-
-    .then(function(response){
-
-      return response.json();
-
-    })
-
-    .then(function(data){
-
-      DATA = data;
-
-      render();
-
-    })
-
-    .catch(function(error){
-
-      console.error("Refresh Error:",error);
-
-    });
-
-},60000);
-
+  }catch(error){
+    console.error("Dashboard API Error:",error);
+    document.getElementById("sub").textContent="Unable to refresh dashboard data. " + (DATA.length ? "Showing previously loaded data." : "Check the Apps Script deployment.");
+  }
+}
+loadData();
+setInterval(loadData,60000);
 </script>
-
 </body>
 </html>
