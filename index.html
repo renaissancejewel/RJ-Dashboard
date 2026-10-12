@@ -3,715 +3,177 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-
-<title>RJ Sales Agent Leaderboard</title>
-
+<title>Renaissance Jewel · Sales Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#f7f4ee;
-  --card:#fff;
-  --ink:#14213d;
-  --mut:#6b7280;
-  --gold:#b8892b;
-  --bar:#14213d;
-  --line:#e6e0d3;
-  --hi:#f5ecd6;
-  box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px);
-  padding-bottom:env(safe-area-inset-bottom,0px)
-}
-
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --bg:#0e1526;
-    --card:#16203a;
-    --ink:#f1ece0;
-    --mut:#9aa4b8;
-    --gold:#d9b25a;
-    --bar:#d9b25a;
-    --line:#26314f;
-    --hi:#22304f
-  }
-}
-
-:root[data-theme="dark"]{
-  --bg:#0e1526;
-  --card:#16203a;
-  --ink:#f1ece0;
-  --mut:#9aa4b8;
-  --gold:#d9b25a;
-  --bar:#d9b25a;
-  --line:#26314f;
-  --hi:#22304f
-}
-
-*{
-  box-sizing:border-box
-}
-
-html{
-  scroll-padding-top:env(safe-area-inset-top,0px)
-}
-
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:"Century Gothic","Avenir Next",Avenir,"Segoe UI",Helvetica,Arial,sans-serif;
-  line-height:1.4
-}
-
-.wrap{
-  max-width:980px;
-  margin:0 auto;
-  padding:20px 16px 40px
-}
-
-h1{
-  font-size:22px;
-  margin:0 0 2px;
-  letter-spacing:.3px
-}
-
-h1 span{
-  color:var(--gold)
-}
-
-.sub{
-  color:var(--mut);
-  font-size:13px;
-  margin:0 0 16px
-}
-
-.tabs{
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap;
-  margin-bottom:14px
-}
-
-.tabs button{
-  border:1px solid var(--line);
-  background:var(--card);
-  color:var(--ink);
-  padding:7px 14px;
-  border-radius:999px;
-  font:inherit;
-  font-size:13px;
-  cursor:pointer
-}
-
-.tabs button.on{
-  background:var(--ink);
-  color:var(--bg);
-  border-color:var(--ink)
-}
-
-.kpis{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:10px;
-  margin-bottom:14px
-}
-
-.kpi{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:12px 14px;
-  cursor:pointer;
-  text-align:left;
-  color:var(--ink);
-  font:inherit
-}
-
-.kpi.on{
-  border-color:var(--gold);
-  box-shadow:0 0 0 1px var(--gold)
-}
-
-.kpi b{
-  display:block;
-  font-size:26px;
-  margin-top:2px
-}
-
-.kpi small{
-  color:var(--mut);
-  font-size:12px
-}
-
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:14px 16px;
-  margin-bottom:14px
-}
-
-.card h2{
-  font-size:15px;
-  margin:0 0 10px
-}
-
-.row{
-  display:grid;
-  grid-template-columns:30px 78px 1fr 60px;
-  align-items:center;
-  gap:8px;
-  padding:5px 0
-}
-
-.rk{
-  width:26px;
-  height:26px;
-  border-radius:50%;
-  background:var(--line);
-  font-size:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:700
-}
-
-.r1 .rk{
-  background:#d4af37;
-  color:#14213d
-}
-
-.r2 .rk{
-  background:#c0c0c0;
-  color:#14213d
-}
-
-.r3 .rk{
-  background:#cd7f32;
-  color:#fff
-}
-
-.nm{
-  font-size:14px;
-  font-weight:600
-}
-
-.trk{
-  background:var(--line);
-  border-radius:6px;
-  height:14px;
-  overflow:hidden
-}
-
-.fill{
-  height:100%;
-  background:var(--bar);
-  border-radius:6px
-}
-
-.r1 .fill{
-  background:var(--gold)
-}
-
-.val{
-  text-align:right;
-  font-weight:700;
-  font-size:14px
-}
-
-.scroll{
-  overflow-x:auto
-}
-
-table{
-  border-collapse:collapse;
-  width:100%;
-  font-size:13px;
-  min-width:560px
-}
-
-th,td{
-  padding:7px 8px;
-  text-align:right;
-  border-bottom:1px solid var(--line)
-}
-
-th:first-child,
-td:first-child{
-  text-align:left
-}
-
-th{
-  color:var(--mut);
-  font-weight:600;
-  cursor:pointer;
-  white-space:nowrap
-}
-
-td.hl,
-th.hl{
-  background:var(--hi)
-}
-
-.note{
-  color:var(--mut);
-  font-size:12px;
-  margin:6px 0 0
-}
+:root{--navy:#0f1e3d;--navy2:#1b2f5c;--gold:#c9a24b;--gold2:#e4c77f;--cream:#f8f3e7;--card:#f8f3e7;--ink:#111111;--mute:#5d5642;--line:#d9ccab;
+--serif:'Playfair Display',Georgia,serif;--sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;box-sizing:border-box}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0}
+body{background:var(--navy);color:var(--cream);font-family:var(--sans);padding-bottom:env(safe-area-inset-bottom,0px)}
+header{background:#08112a;color:var(--cream);padding:calc(14px + env(safe-area-inset-top,0px)) 20px 14px;border-bottom:3px solid var(--gold)}
+.bar{max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+h1{font-family:var(--serif);font-weight:600;font-size:1.35rem;margin:0;letter-spacing:.02em}
+h1 small{display:block;font:500 .68rem var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--gold2);margin-bottom:2px}
+.months{display:flex;gap:6px}
+.months button{font:500 .85rem var(--sans);background:transparent;color:var(--cream);border:1px solid var(--gold);border-radius:999px;padding:7px 16px;cursor:pointer}
+.months button.on{background:var(--gold);color:var(--navy);font-weight:600}
+main{max-width:1200px;margin:0 auto;padding:20px 16px 40px}
+.meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;color:#cdbf9a;font-size:.78rem;margin-bottom:14px}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:10px;padding:18px;cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%;transition:transform .15s,box-shadow .15s}
+.card:hover,.card:focus-visible{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.4);outline:none}
+.card .lbl{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.card .tot{font-family:var(--serif);font-size:2.1rem;color:#111;margin:4px 0 12px;font-weight:700}
+.top{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.top li,.rows li{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0e8d3;font-size:.9rem}
+.rk{width:22px;height:22px;border-radius:50%;background:#111;color:var(--gold2);font-size:.72rem;display:grid;place-items:center;flex:none;font-weight:600}
+.nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vl{font-weight:600;color:#111;font-variant-numeric:tabular-nums}
+.hint{font-size:.72rem;color:#8a6a1c;margin-top:10px;font-weight:600}
+.chart{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center}
+.legend{list-style:none;margin:0;padding:0;font-size:.82rem;flex:1;min-width:140px}
+.legend li{display:flex;align-items:center;gap:8px;padding:3px 0}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.vbars{display:flex;align-items:flex-end;gap:10px;height:var(--h,150px);border-bottom:1px solid var(--line);padding:0 4px}
+.vb{flex:1;min-width:var(--bw,0);display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+.vb i{display:block;width:70%;max-width:56px;background:linear-gradient(var(--gold2),var(--gold));border-radius:4px 4px 0 0;min-height:2px}
+.vb b{font-size:.72rem;color:#111;margin-bottom:3px;font-variant-numeric:tabular-nums}
+.names{display:flex;gap:10px;padding:6px 4px 0}
+.names span{flex:1;min-width:var(--bw,0);text-align:center;font-size:.72rem;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scroll{overflow-x:auto;max-width:100%}
+.panel{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:10px;padding:20px}
+.panel h2{font-family:var(--serif);color:#111;margin:0 0 4px;font-size:1.5rem}
+.back{background:none;border:0;color:#111;font:600 .85rem var(--sans);cursor:pointer;padding:0 0 12px}
+.rows{list-style:none;margin:16px 0 0;padding:0}
+.big{display:flex;gap:24px;flex-wrap:wrap;align-items:center;justify-content:center}
+.sub{color:var(--mute);font-size:.85rem;margin-bottom:10px}
+.note{margin-top:28px;padding:14px 16px;border-left:3px solid var(--gold);background:rgba(201,162,75,.14);color:#e9dfc2;font-size:.78rem;line-height:1.5;border-radius:0 8px 8px 0}
+.err{background:#fff3f0;border:1px solid #e8b7ad;color:#7a2a1d;padding:14px;border-radius:8px;font-size:.9rem}
+.empty{color:var(--mute);font-size:.88rem;padding:8px 0}
+.breakdown-title{font:600 1rem var(--sans);color:var(--ink);margin:22px 0 0}
+.card:focus-visible,.back:focus-visible,.months button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+@media(max-width:520px){.big svg{max-width:100%;height:auto}.panel{padding:15px}.legend{min-width:0}}
+@media(max-width:520px){h1{font-size:1.15rem}.card .tot{font-size:1.8rem}.months{width:100%}.months button{flex:1}}
 </style>
 </head>
-
 <body>
-
-<div class="wrap">
-
-  <h1>Agent <span>Leaderboard</span></h1>
-
-  <p class="sub" id="sub"></p>
-
-  <div class="tabs" id="periods"></div>
-
-  <div class="kpis" id="kpis"></div>
-
-  <div class="card">
-    <h2 id="lbt"></h2>
-    <div id="lb"></div>
-    <p class="note" id="incentive-disclaimer" hidden>Incentive amounts shown are estimates and are subject to review and final approval.</p>
-  </div>
-
-  <div class="card">
-    <h2>All agents</h2>
-
-    <div class="scroll">
-      <table id="tb"></table>
-    </div>
-
-    <p class="note" id="notes"></p>
-  </div>
-
-</div>
-
+<header><div class="bar">
+  <h1><small>Renaissance Jewel</small>Sales Dashboard</h1>
+  <div class="months" id="months" role="tablist" aria-label="Month"></div>
+</div></header>
+<main>
+  <div class="meta"><span id="status">Loading…</span><span>Auto-refreshes every 60 seconds</span></div>
+  <div id="view"></div>
+  <p class="note" id="disclaimer">Incentive figures shown are indicative and based on recorded activity. They remain subject to review and final approval and may be adjusted before payout.</p>
+</main>
 <script>
+// Deployed Apps Script web-app URL (version 3 JSON)
+const API_URL = "https://script.google.com/macros/s/AKfycbw4oxTn6UTxjiWa3pkob3jJMCPm2weD7Y4GHBMRNdujwLwZWXeYKOttg6pIkOOUNGRM/exec";
+const REFRESH_MS = 60000;
+const MONTH_LABELS={'2026-09':'September 2026','2026-10':'October 2026'};
 
-/* =========================================================
-   GOOGLE APPS SCRIPT API
-   ========================================================= */
-
-const API_URL =
-"https://script.google.com/macros/s/AKfycbw4oxTn6UTxjiWa3pkob3jJMCPm2weD7Y4GHBMRNdujwLwZWXeYKOttg6pIkOOUNGRM/exec";
-
-let DATA = [];
-let OVERTIME = [];
-let TODAY = "";
-let overtimeAvailable = false;
-
-
-/* =========================================================
-   DASHBOARD METRICS
-   ========================================================= */
-
-var M = [
-  "Total Incentives",
-  "Saved Cancellation",
-  "General Queries",
-  "Issues Resolved",
-  "Total Interactions",
-  "Overtime Hours"
+const SPECS = [
+  {id:'interactions',key:'totalInteractions',label:'Total Interactions',fmt:'n',kind:'rank'},
+  {id:'resolved',key:'issuesResolved',label:'Issues Resolved',fmt:'n',kind:'rank'},
+  {id:'cancel',key:'savedCancellation',label:'Saved Cancellation',fmt:'n',kind:'rank'},
+  {id:'incentive',key:'incentives',label:'Total Incentives',fmt:'₹',kind:'rank'},
+  {id:'overtime',key:'overtimeHours',label:'Overtime Hours',fmt:'h',kind:'donut'},
+  {id:'hours',key:'workingHours',label:'Total Working Hours',fmt:'h',kind:'bars'}
 ];
+const COLORS=['#111111','#c9a24b','#2c4a8a','#8a6a1c','#4d6bb0','#d9b865','#3a3a3a','#a8935a','#1b2f5c','#e4c77f'];
+let state={data:null,month:null,view:'summary',err:null,updated:null};
 
-var S = [
-  "Incentives",
-  "Saved Cancellation",
-  "General Queries",
-  "Issues Resolved",
-  "Total Interactions",
-  "Overtime Hours"
-];
-
-
-/* =========================================================
-   PERIOD
-   ========================================================= */
-
-var PER = { Sep:"2026-09", Oct:"2026-10" };
-var PL = { Sep:"September 2026", Oct:"October 2026" };
-var per = "Oct";
-var met = 0;
-
-
-/* =========================================================
-   AGGREGATE DATA
-   ========================================================= */
-
-function nameKey(name){
-  return String(name || "").trim().replace(/\s+/g," ").toLowerCase();
+const num=v=>{const n=Number(v);return Number.isFinite(n)?n:0};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fmt(v,f){
+ v=num(v);
+ if(f==='₹')return '₹'+v.toLocaleString('en-IN',{maximumFractionDigits:2});
+ if(f==='h')return v.toLocaleString('en-IN',{maximumFractionDigits:2})+' h';
+ return v.toLocaleString('en-IN',{maximumFractionDigits:0});
 }
-function number(value){
-  var n = Number(value);
-  return Number.isFinite(n) ? n : 0;
+function monthList(d){return Object.keys(MONTH_LABELS).filter(k=>(d.months||[]).includes(k)&&d.summaries?.[k]).map(k=>({key:k,label:MONTH_LABELS[k]}));}
+function rows(spec,s){
+ const list=(Array.isArray(s?.agents)?s.agents:[]).map(a=>({name:String(a.agent??a.name??'Unknown'),v:num(a[spec.key])})).sort((a,b)=>b.v-a.v||a.name.localeCompare(b.name));
+ const total=s?.totals?.[spec.key]!=null?num(s.totals[spec.key]):list.reduce((sum,a)=>sum+a.v,0);
+ return {list,total};
 }
-function escapeHtml(value){
-  return String(value).replace(/[&<>"']/g,function(c){
-    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
-  });
+function topFiveOther(list){
+ const positive=list.filter(x=>x.v>0),top=positive.slice(0,5);
+ const rest=positive.slice(5).reduce((sum,x)=>sum+x.v,0);
+ if(rest>0)top.push({name:'Others',v:rest});
+ return top;
 }
-function display(value,metric){
-  return value.toLocaleString("en-US",{maximumFractionDigits: metric===0 || metric===5 ? 2 : 0}) + (metric===5 ? " hrs" : "");
+function donut(list,size,total){
+  const sum=list.reduce((x,y)=>x+y.v,0),r=size*.38,c=2*Math.PI*r,sw=size*.17;let off=0;
+  const segs=sum>0?list.filter(x=>x.v>0).map((x,i)=>{const len=x.v/sum*c;
+    const s=`<circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${COLORS[i%COLORS.length]}" stroke-width="${sw}" stroke-dasharray="${len} ${c-len}" stroke-dashoffset="${-off}" transform="rotate(-90 ${size/2} ${size/2})"/>`;off+=len;return s}).join(''):
+    `<circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#eee6cf" stroke-width="${sw}"/>`;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="Overtime share by employee">${segs}
+  <text x="50%" y="48%" text-anchor="middle" font-family="Playfair Display,serif" font-size="${size*.14}" font-weight="700" fill="#111">${fmt(total,'h')}</text>
+  <text x="50%" y="60%" text-anchor="middle" font-size="${size*.065}" fill="#6b7285">overtime</text></svg>`;
 }
-function agg(){
-  var o = Object.create(null);
-  var today = TODAY || new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
-  function agent(name){
-    var key = nameKey(name);
-    if(!key || /^(total|team|agent name|name)$/.test(key)) return null;
-    if(!o[key]) o[key] = {n:String(name).trim(),v:[0,0,0,0,0,0]};
-    return o[key];
-  }
-  DATA.forEach(function(row){
-    var date = String(row.date || "").slice(0,10);
-    if(!/^\d{4}-\d{2}-\d{2}$/.test(date) || date.slice(0,7)!==PER[per] || date>today) return;
-    var a = agent(row.agent);
-    if(!a) return;
-    [row.incentives === undefined ? row.sales : row.incentives,row.savedCancellation,row.generalQueries,row.issuesResolved,row.totalInteractions].forEach(function(value,i){a.v[i]+=number(value);});
-  });
-  // Monthly overtime is added once per employee, never once per daily record.
-  OVERTIME.forEach(function(row){
-    if(row.month!==PER[per]) return;
-    var a=agent(row.agent);
-    if(a) a.v[5]+=number(row.hours);
-  });
-  return Object.keys(o).map(function(key){return o[key];});
+function vbars(list,h,wide){
+  const max=Math.max(1,...list.map(x=>x.v));
+  const bw=wide?'68px':'0';
+  const inner=`<div style="--bw:${bw};min-width:${wide?list.length*82:0}px">
+   <div class="vbars" style="--h:${h}px">${list.map(x=>`<div class="vb" style="--bw:${bw}"><b>${fmt(x.v)}</b><i style="height:${Math.max(x.v/max*(h-22),2)}px"></i></div>`).join('')}</div>
+   <div class="names">${list.map(x=>`<span style="--bw:${bw}" title="${esc(x.name)}">${esc(x.name)}</span>`).join('')}</div></div>`;
+  return `<div class="scroll">${inner}</div>`;
 }
-
-/* =========================================================
-   BUTTON CREATOR
-   ========================================================= */
-
-function btn(cls,txt,fn){
-
-  var b = document.createElement("button");
-
-  b.className = cls;
-
-  b.innerHTML = txt;
-
-  b.onclick = fn;
-
-  return b;
-
-}
-
-
-/* =========================================================
-   RENDER DASHBOARD
-   ========================================================= */
 
 function render(){
-
-  var rows = agg();
-
-  var tot = [0,0,0,0,0,0];
-
-
-  /* Calculate team totals */
-
-  rows.forEach(function(r){
-
-    for(var i=0;i<M.length;i++){
-
-      tot[i] += r.v[i];
-
-    }
-
-  });
-
-
-  /* Sort leaderboard */
-
-  rows.sort(function(a,b){
-
-    return b.v[met] - a.v[met] ||
-           a.n.localeCompare(b.n);
-
-  });
-
-
-  /* Subtitle */
-
-  document.getElementById("sub").textContent =
-    PL[per] +
-    " · " +
-    rows.length +
-    " agents · Updated through today";
-
-
-  /* =======================================================
-     PERIOD BUTTON
-     ======================================================= */
-
-  var pe = document.getElementById("periods");
-
-  pe.innerHTML = "";
-
-  Object.keys(PER).forEach(function(key){
-    pe.appendChild(btn(key===per ? "on" : "",PL[key],function(){per=key;render();}));
-  });
-
-  /* =======================================================
-     KPI CARDS
-     ======================================================= */
-
-  var kp = document.getElementById("kpis");
-
-  kp.innerHTML = "";
-
-
-  for(var i=0;i<M.length;i++)
-
-    (function(i){
-
-      var k = btn(
-
-        "kpi" + (i===met ? " on" : ""),
-
-        "<small>" +
-        M[i] +
-        "</small>" +
-        "<b>" +
-        display(tot[i],i) +
-        "</b>",
-
-        function(){
-
-          met = i;
-
-          render();
-
-        }
-
-      );
-
-      kp.appendChild(k);
-
-    })(i);
-
-
-  /* =======================================================
-     LEADERBOARD TITLE
-     ======================================================= */
-
-  document.getElementById("lbt").textContent =
-    "Leaderboard · " + M[met];
-
-
-  /* =======================================================
-     LEADERBOARD
-     ======================================================= */
-
-  var mx = rows.length
-    ? Math.max(1,rows[0].v[met])
-    : 1;
-
-  var h = "";
-
-
-  if(!rows.length){
-
-    h =
-      '<div class="note">' +
-      'No data available for this period.' +
-      '</div>';
-
+  const v=document.getElementById('view'),d=state.data;
+  document.getElementById('status').textContent=state.err?'Update failed — showing last data':state.updated?'Updated '+state.updated.toLocaleTimeString():'Loading…';
+  if(!d){v.innerHTML=`<div class="err">${esc(state.err||'Loading…')}</div>`;return}
+  const ml=document.getElementById('months');
+  ml.innerHTML=state.months.map(m=>`<button role="tab" class="${m.key===state.month?'on':''}" data-m="${esc(m.key)}">${esc(m.label)}</button>`).join('');
+  const s=d.summaries?.[state.month];
+  if(!s){v.innerHTML='<p class="empty">No data for this month.</p>';return}
+  const err=state.err?`<div class="err" style="margin-bottom:12px">${esc(state.err)}</div>`:'';
+  if(state.view==='summary'){
+    v.innerHTML=err+`<div class="grid">${SPECS.map(sp=>{
+      const {list,total}=rows(sp,s);
+      let body='';
+      if(sp.kind==='rank')body=list.length?`<ul class="top">${list.slice(0,3).map((x,i)=>`<li><span class="rk">${i+1}</span><span class="nm">${esc(x.name)}</span><span class="vl">${fmt(x.v,sp.fmt)}</span></li>`).join('')}</ul>`:'<p class="empty">No employees</p>';
+      if(sp.kind==='donut')body=`<div class="chart">${donut(topFiveOther(list),130,total)}<ul class="legend">${topFiveOther(list).map((x,i)=>`<li><span class="dot" style="background:${COLORS[i%COLORS.length]}"></span><span class="nm">${esc(x.name)}</span><span class="vl">${fmt(x.v,'h')}</span></li>`).join('')}</ul></div>`;
+      if(sp.kind==='bars')body=vbars(list.slice(0,3),130,false);
+      return `<button class="card" data-v="${sp.id}"><div class="lbl">${sp.label}</div><div class="tot">${fmt(total,sp.fmt)}</div>${body}<div class="hint">${sp.kind==='rank'?'View full leaderboard →':'View full breakdown →'}</div></button>`}).join('')}</div>`;
+  }else{
+    const sp=SPECS.find(x=>x.id===state.view),{list,total}=rows(sp,s);
+    const ml=state.months.find(m=>m.key===state.month)?.label||'';
+    let vis='';
+    if(sp.kind==='donut')vis=`<div class="big">${donut(topFiveOther(list),280,total)}<ul class="legend" style="min-width:200px">${topFiveOther(list).map((x,i)=>`<li><span class="dot" style="background:${COLORS[i%COLORS.length]}"></span><span class="nm">${esc(x.name)}</span><span class="vl">${fmt(x.v,'h')}</span></li>`).join('')}</ul></div>`;
+    if(sp.kind==='bars')vis=vbars(list,280,true);
+    const tbl=`<ul class="rows">${list.map((x,i)=>`<li><span class="rk">${i+1}</span><span class="nm">${esc(x.name)}</span><span class="vl">${fmt(x.v,sp.fmt)}</span></li>`).join('')}</ul>`;
+    v.innerHTML=err+`<div class="panel"><button class="back" data-v="summary">← Back to summary</button><h2>${sp.label}</h2>
+      <div class="sub">${esc(ml)} · Team total ${fmt(total,sp.fmt)}</div>${vis}<h3 class="breakdown-title">All employees</h3>${tbl}${list.length?'':'<p class="empty">No employees</p>'}</div>`;
   }
-
-
-  rows.forEach(function(r,i){
-
-    h +=
-
-      '<div class="row r' + (i+1) + '">' +
-
-        '<div class="rk">' +
-          (i+1) +
-        '</div>' +
-
-        '<div class="nm">' +
-          escapeHtml(r.n) +
-        '</div>' +
-
-        '<div class="trk">' +
-
-          '<div class="fill" style="width:' +
-            (r.v[met] / mx * 100) +
-            '%' +
-          '"></div>' +
-
-        '</div>' +
-
-        '<div class="val">' +
-          display(r.v[met],met) +
-        '</div>' +
-
-      '</div>';
-
-  });
-
-
-  document.getElementById("lb").innerHTML = h;
-  document.getElementById("incentive-disclaimer").hidden = met !== 0;
-
-
-  /* =======================================================
-     TABLE HEADER
-     ======================================================= */
-
-  var t = "<tr><th>Agent</th>";
-
-
-  for(var j=0;j<M.length;j++){
-
-    t +=
-
-      '<th class="' +
-      (j===met ? "hl" : "") +
-      '" data-m="' +
-      j +
-      '">' +
-      S[j] +
-      '</th>';
-
-  }
-
-
-  t += "</tr>";
-
-
-  /* =======================================================
-     TABLE ROWS
-     ======================================================= */
-
-  rows.forEach(function(r){
-
-    t +=
-
-      "<tr>" +
-
-        "<td>" +
-          escapeHtml(r.n) +
-        "</td>";
-
-
-    for(var j=0;j<M.length;j++){
-
-      t +=
-
-        '<td class="' +
-        (j===met ? "hl" : "") +
-        '">' +
-        display(r.v[j],j) +
-        "</td>";
-
-    }
-
-
-    t += "</tr>";
-
-  });
-
-
-  /* =======================================================
-     TEAM TOTAL
-     ======================================================= */
-
-  t +=
-
-    '<tr>' +
-
-      '<td><b>Team</b></td>' +
-
-      tot.map(function(x,j){
-
-        return (
-
-          '<td class="' +
-          (j===met ? "hl" : "") +
-          '">' +
-
-          '<b>' +
-          display(x,j) +
-          '</b>' +
-
-          '</td>'
-
-        );
-
-      }).join("") +
-
-    "</tr>";
-
-
-  /* =======================================================
-     INSERT TABLE
-     ======================================================= */
-
-  var tb = document.getElementById("tb");
-
-  tb.innerHTML = t;
-
-
-  /* =======================================================
-     CLICKABLE TABLE HEADERS
-     ======================================================= */
-
-  tb.querySelectorAll("th[data-m]")
-
-    .forEach(function(th){
-
-      th.onclick = function(){
-
-        met = +th.dataset.m;
-
-        render();
-
-      };
-
-    });
-
-
-  /* =======================================================
-     NOTE
-     ======================================================= */
-
-  document.getElementById("notes").textContent =
-
-    "Source: Sales Tracker · " +
-    PL[per] + " · " +
-    "Data refreshes automatically every 60 seconds. Overtime is monthly in decimal hours." +
-    (overtimeAvailable ? "" : " Overtime unavailable: update the Apps Script deployment.");
-
+  document.getElementById('disclaimer').style.display=(state.view==='summary'||state.view==='incentive')?'':'none';
 }
 
-
-/* Load both daily performance and monthly overtime together. */
-async function loadData(){
+async function load(){
   try{
-    var response=await fetch(API_URL,{cache:"no-store"});
-    if(!response.ok) throw new Error("HTTP " + response.status);
-    var payload=await response.json();
-    if(payload.error) throw new Error(payload.error);
-    var data=Array.isArray(payload) ? payload : payload.data;
-    if(!Array.isArray(data)) throw new Error("Unexpected dashboard response");
-    if(!Array.isArray(payload) && !Array.isArray(payload.overtime)) throw new Error("Missing overtime data");
-    DATA=data;
-    OVERTIME=Array.isArray(payload.overtime) ? payload.overtime : [];
-    TODAY=payload.today || "";
-    overtimeAvailable=!Array.isArray(payload);
-    render();
-  }catch(error){
-    console.error("Dashboard API Error:",error);
-    document.getElementById("sub").textContent="Unable to refresh dashboard data. " + (DATA.length ? "Showing previously loaded data." : "Check the Apps Script deployment.");
-  }
+    if(!API_URL||API_URL.startsWith('PASTE'))throw new Error('Set API_URL at the top of this file to your Apps Script web-app URL.');
+    const r=await fetch(API_URL,{cache:'no-store'});
+    if(!r.ok)throw new Error('Server responded '+r.status);
+    const d=await r.json();
+    if(d.error)throw new Error(d.error);
+    if(d.version!==3||!d.summaries)throw new Error('Unexpected API response: version 3 summaries required');
+    state.data=d;state.err=null;state.updated=new Date();
+    const ml=monthList(d);
+    if(!ml.length)throw new Error('No September or October 2026 data found in the API');
+    state.months=ml;
+    if(!ml.some(m=>m.key===state.month))state.month=(ml.find(m=>m.key==='2026-10')||ml[ml.length-1]).key;
+  }catch(e){state.err=e.message||String(e)}
+  render();
 }
-loadData();
-setInterval(loadData,60000);
+document.addEventListener('click',e=>{
+  const m=e.target.closest('[data-m]');if(m){state.month=m.dataset.m;render();return}
+  const c=e.target.closest('[data-v]');if(c){state.view=c.dataset.v;render();window.scrollTo({top:0})}
+});
+load();setInterval(load,REFRESH_MS);
 </script>
 </body>
 </html>
