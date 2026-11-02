@@ -61,7 +61,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px 40px}
 <body>
 <header><div class="bar">
   <h1><small>Renaissance Jewel</small>Sales Dashboard</h1>
-  <div class="months" id="months" role="tablist" aria-label="Month"></div>
+  <div class="months" style="flex-wrap:wrap" id="months" role="tablist" aria-label="Month"></div>
 </div></header>
 <main>
   <div class="meta"><span id="status">Loading…</span><span>Auto-refreshes every 60 seconds</span></div>
@@ -72,7 +72,9 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px 40px}
 // Deployed Apps Script web-app URL (version 3 JSON)
 const API_URL = "https://script.google.com/macros/s/AKfycbw4oxTn6UTxjiWa3pkob3jJMCPm2weD7Y4GHBMRNdujwLwZWXeYKOttg6pIkOOUNGRM/exec";
 const REFRESH_MS = 60000;
-const MONTH_LABELS={'2026-09':'September 2026','2026-10':'October 2026'};
+const START_MONTH='2026-09';
+function currentMonth(){const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit'}).formatToParts(new Date());return p.find(x=>x.type==='year').value+'-'+p.find(x=>x.type==='month').value;}
+function monthLabel(key){return new Date(key+'-01T12:00:00Z').toLocaleDateString('en-US',{month:'long',year:'numeric',timeZone:'UTC'});}
 
 const SPECS = [
   {id:'interactions',key:'totalInteractions',label:'Total Interactions',fmt:'n',kind:'rank'},
@@ -83,7 +85,7 @@ const SPECS = [
   {id:'hours',key:'workingHours',label:'Total Working Hours',fmt:'h',kind:'bars'}
 ];
 const COLORS=['#111111','#c9a24b','#2c4a8a','#8a6a1c','#4d6bb0','#d9b865','#3a3a3a','#a8935a','#1b2f5c','#e4c77f'];
-let state={data:null,month:null,view:'summary',err:null,updated:null};
+let state={data:null,month:null,view:'summary',err:null,updated:null,months:[],calendarMonth:null};
 
 const num=v=>{const n=Number(v);return Number.isFinite(n)?n:0};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -93,7 +95,13 @@ function fmt(v,f){
  if(f==='h')return v.toLocaleString('en-IN',{maximumFractionDigits:2})+' h';
  return v.toLocaleString('en-IN',{maximumFractionDigits:0});
 }
-function monthList(d){return Object.keys(MONTH_LABELS).filter(k=>(d.months||[]).includes(k)&&d.summaries?.[k]).map(k=>({key:k,label:MONTH_LABELS[k]}));}
+function monthList(d){
+ const now=currentMonth(), keys=new Set([...(d.months||[]),...Object.keys(d.summaries||{})]);
+ for(let y=2026,m=9;y+'-'+String(m).padStart(2,'0')<=now;){keys.add(y+'-'+String(m).padStart(2,'0'));if(++m===13){m=1;y++;}}
+ return [...keys].filter(k=>/^\d{4}-(0[1-9]|1[0-2])$/.test(k)&&k>=START_MONTH&&k<=now).sort().map(key=>({key,label:monthLabel(key)}));
+}
+function emptySummary(){return {agents:[],totals:Object.fromEntries(SPECS.map(s=>[s.key,0])),hasData:false};}
+
 function rows(spec,s){
  const list=(Array.isArray(s?.agents)?s.agents:[]).map(a=>({name:String(a.agent??a.name??'Unknown'),v:num(a[spec.key])})).sort((a,b)=>b.v-a.v||a.name.localeCompare(b.name));
  const total=s?.totals?.[spec.key]!=null?num(s.totals[spec.key]):list.reduce((sum,a)=>sum+a.v,0);
@@ -129,26 +137,29 @@ function render(){
   if(!d){v.innerHTML=`<div class="err">${esc(state.err||'Loading…')}</div>`;return}
   const ml=document.getElementById('months');
   ml.innerHTML=state.months.map(m=>`<button role="tab" class="${m.key===state.month?'on':''}" data-m="${esc(m.key)}">${esc(m.label)}</button>`).join('');
-  const s=d.summaries?.[state.month];
+  const s=d.summaries?.[state.month]||emptySummary();
+  const blank=s.hasData===false || (s.hasData==null && SPECS.every(sp=>num(s.totals?.[sp.key])===0));
+  const blankNote=blank?'<p class="empty">No data entered yet.</p>':'';
   if(!s){v.innerHTML='<p class="empty">No data for this month.</p>';return}
+  const sourceNote=(d.warnings||[]).filter(w=>w.startsWith((monthLabel(state.month).split(' ')[0].slice(0,3))));
   const err=state.err?`<div class="err" style="margin-bottom:12px">${esc(state.err)}</div>`:'';
   if(state.view==='summary'){
-    v.innerHTML=err+`<div class="grid">${SPECS.map(sp=>{
-      const {list,total}=rows(sp,s);
+    v.innerHTML=err+sourceNote.map(w=>'<p class="empty">'+esc(w)+'</p>').join('')+blankNote+`<div class="grid">${SPECS.map(sp=>{
+      const {list,total}=rows(sp,blank?emptySummary():s);
       let body='';
-      if(sp.kind==='rank')body=list.length?`<ul class="top">${list.slice(0,3).map((x,i)=>`<li><span class="rk">${i+1}</span><span class="nm">${esc(x.name)}</span><span class="vl">${fmt(x.v,sp.fmt)}</span></li>`).join('')}</ul>`:'<p class="empty">No employees</p>';
+      if(sp.kind==='rank')body=list.length?`<ul class="top">${list.slice(0,3).map((x,i)=>`<li><span class="rk">${i+1}</span><span class="nm">${esc(x.name)}</span><span class="vl">${fmt(x.v,sp.fmt)}</span></li>`).join('')}</ul>`:'<p class="empty">No data entered yet.</p>';
       if(sp.kind==='donut')body=`<div class="chart">${donut(topFiveOther(list),130,total)}<ul class="legend">${topFiveOther(list).map((x,i)=>`<li><span class="dot" style="background:${COLORS[i%COLORS.length]}"></span><span class="nm">${esc(x.name)}</span><span class="vl">${fmt(x.v,'h')}</span></li>`).join('')}</ul></div>`;
       if(sp.kind==='bars')body=vbars(list.slice(0,3),130,false);
       return `<button class="card" data-v="${sp.id}"><div class="lbl">${sp.label}</div><div class="tot">${fmt(total,sp.fmt)}</div>${body}<div class="hint">${sp.kind==='rank'?'View full leaderboard →':'View full breakdown →'}</div></button>`}).join('')}</div>`;
   }else{
-    const sp=SPECS.find(x=>x.id===state.view),{list,total}=rows(sp,s);
+    const sp=SPECS.find(x=>x.id===state.view),{list,total}=rows(sp,blank?emptySummary():s);
     const ml=state.months.find(m=>m.key===state.month)?.label||'';
     let vis='';
     if(sp.kind==='donut')vis=`<div class="big">${donut(topFiveOther(list),280,total)}<ul class="legend" style="min-width:200px">${topFiveOther(list).map((x,i)=>`<li><span class="dot" style="background:${COLORS[i%COLORS.length]}"></span><span class="nm">${esc(x.name)}</span><span class="vl">${fmt(x.v,'h')}</span></li>`).join('')}</ul></div>`;
     if(sp.kind==='bars')vis=vbars(list,280,true);
     const tbl=`<ul class="rows">${list.map((x,i)=>`<li><span class="rk">${i+1}</span><span class="nm">${esc(x.name)}</span><span class="vl">${fmt(x.v,sp.fmt)}</span></li>`).join('')}</ul>`;
     v.innerHTML=err+`<div class="panel"><button class="back" data-v="summary">← Back to summary</button><h2>${sp.label}</h2>
-      <div class="sub">${esc(ml)} · Team total ${fmt(total,sp.fmt)}</div>${vis}<h3 class="breakdown-title">All employees</h3>${tbl}${list.length?'':'<p class="empty">No employees</p>'}</div>`;
+      <div class="sub">${esc(ml)} · Team total ${fmt(total,sp.fmt)}</div>${vis}<h3 class="breakdown-title">All employees</h3>${tbl}${list.length?'':'<p class="empty">No data entered yet.</p>'}</div>`;
   }
   document.getElementById('disclaimer').style.display=(state.view==='summary'||state.view==='incentive')?'':'none';
 }
@@ -163,9 +174,11 @@ async function load(){
     if(d.version!==3||!d.summaries)throw new Error('Unexpected API response: version 3 summaries required');
     state.data=d;state.err=null;state.updated=new Date();
     const ml=monthList(d);
-    if(!ml.length)throw new Error('No September or October 2026 data found in the API');
+    if(!ml.length)throw new Error('No months available');
     state.months=ml;
-    if(!ml.some(m=>m.key===state.month))state.month=(ml.find(m=>m.key==='2026-10')||ml[ml.length-1]).key;
+    const now=currentMonth();
+    if(state.calendarMonth!==now || !ml.some(m=>m.key===state.month))state.month=now;
+    state.calendarMonth=now;
   }catch(e){state.err=e.message||String(e)}
   render();
 }
